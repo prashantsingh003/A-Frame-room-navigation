@@ -1,0 +1,134 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>images</title>
+    <script src="https://aframe.io/releases/1.3.0/aframe.min.js"></script>
+    <script src="https://unpkg.com/aframe-event-set-component@5.0.0/dist/aframe-event-set-component.min.js"></script>
+    <script src="https://unpkg.com/aframe-layout-component@5.3.0/dist/aframe-layout-component.min.js"></script>
+    <script src="https://unpkg.com/aframe-template-component@3.2.1/dist/aframe-template-component.min.js"></script>
+    <script src="https://unpkg.com/aframe-proxy-event-component@2.1.0/dist/aframe-proxy-event-component.min.js"></script>
+    <script src="https://unpkg.com/aframe-environment-component@1.1.0/dist/aframe-environment-component.min.js"></script>
+
+    <script id="link" type="text/html">
+        <a-entity
+          class="link"
+          geometry="primitive: ring; radiusInner:0.2;radiusOuter:0.4;"
+          material="shader: flat;  color:#6666ff;"
+          event-set__mouseenter="material: color:#9999ff"
+          event-set__mouseleave="material: color:#6666ff;"
+        ></a-entity>
+    </script>
+</head>
+<body>
+    <a-scene>
+        <a-assets>
+            <img src="images/walker_lake_western.jpg" id="origin">
+            <img src="images/mulberry_harbour.jpg" id="front">
+            <img src="images/Cave.jpg" id="back">
+            <img src="images/oblisque_de_luxor.jpg" id="right">
+            <img src="images/standing_on_water.jpg" id="left">
+        </a-assets>
+
+        <!-- Entity consisting the camera and directional arrows -->
+        <a-entity
+            position="0 0 20"
+            id="cam"
+            animation="
+                property:position;
+                from:0 0 20;
+                to: 0 0 0;
+                dur:2000">
+            <a-camera
+              active="true" wasd-controls-enabled="true">
+                <a-cursor></a-cursor>
+            </a-camera>
+
+            <a-entity class="arrow" id="front_arrow" 
+                template="src:#link;"
+                position="0 0 -2"
+                rotation="-90 0 0">
+            </a-entity>
+            <a-entity class="arrow" id="left_arrow"
+                template="src:#link;"
+                position="-2 0 0"
+                rotation="-90 90 0">
+            </a-entity>
+            <a-entity class="arrow" id="right_arrow"
+                template="src:#link;"
+                position="2 0 0"
+                rotation="-90 -90 0">
+            </a-entity>
+            <a-entity class="arrow" id="back_arrow"
+                template="src:#link;"
+                position="0 0 2"
+                rotation="-90 180 0">
+            </a-entity>
+        </a-entity>
+
+        <!-- Entity containing all the skys -->
+        <a-entity  id="sky">
+            <a-sky id="origin_sphere" src="#origin"
+                position="0 0 0"
+                radius="10">
+            </a-sky>
+            <a-sky id="front_sphere" src="#front"
+                position="0 0 -20"
+                radius="10">
+            </a-sky>
+            <a-sky id="back_sphere" src="#back"
+                position="0 0 20"
+                radius="10">
+            </a-sky>
+            <a-sky id="right_sphere" src="#right"
+                radius="10"
+                position="20 0 0">
+            </a-sky>
+            <a-sky id="left_sphere" src="#left"
+                radius="10"
+                position="-20 0 0">
+            </a-sky>
+        </a-entity>
+    </a-scene>
+
+    <script>
+        var cam=document.querySelector('#cam');
+        var sky=document.querySelector('#sky');
+
+        var origin_sphere=document.querySelector('#origin_sphere');
+        var front_sphere=document.querySelector('#front_sphere');
+        var back_sphere=document.querySelector('#back_sphere');
+        var left_sphere=document.querySelector('#left_sphere');
+        var right_sphere=document.querySelector('#right_sphere');
+        
+        document.querySelectorAll('.arrow').forEach(element => {
+            element.addEventListener('click',event=>{
+                let str=element.getAttribute('id');
+                let dir=str.slice(0,str.indexOf('_'))
+                let from="0 0 0"
+                let to="0 0 0"
+                switch(dir){
+                    case('front'):
+                        to="0 0 -20";
+                        break;
+                    case('back'):
+                        to="0 0 20";
+                        break;
+                    case('left'):
+                        to="-20 0 0";
+                        break;
+                    case('right'):
+                        to="20 0 0"
+                        break;
+                }
+                cam.setAttribute('animation','property: position; from: '+from+'; to: '+to+'; dur: 2000; startEvents: mouse'+dir+';');
+                cam.emit('mouse'+dir);
+            })
+        });
+        console.log(sky.object3D.visible)
+        // setInterval(function(){console.log(cam.object3D.animations)},5000);
+        
+    </script>
+</body>
+</html>
